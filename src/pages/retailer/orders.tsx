@@ -31,7 +31,7 @@ export default function RetailerOrdersPage() {
   useEffect(() => {
     api
       .get<OrderListResponse>("/orders")
-      .then((r) => setOrders(r.data.items))
+      .then((r) => setOrders(r.data.items ?? []))
       .finally(() => setLoading(false));
   }, []);
 
