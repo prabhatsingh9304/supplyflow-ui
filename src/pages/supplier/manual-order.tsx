@@ -136,7 +136,7 @@ export default function ManualOrderPage() {
         {/* Select Retailer */}
         <div className="space-y-1 max-w-md">
           <label className="text-sm font-medium">Retailer</label>
-          <Select value={selectedRetailerId} onValueChange={setSelectedRetailerId}>
+          <Select value={selectedRetailerId} onValueChange={(v) => setSelectedRetailerId(v ?? "")}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a retailer">
                 {selectedRetailerId
@@ -161,7 +161,7 @@ export default function ManualOrderPage() {
         <div className="space-y-1">
           <label className="text-sm font-medium">Add Product</label>
           <div className="flex gap-2 max-w-2xl">
-            <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+            <Select value={selectedProductId} onValueChange={(v) => setSelectedProductId(v ?? "")}>
               <SelectTrigger className="w-full flex-1">
                 <SelectValue placeholder="Select a product">
                   {selectedProductId
