@@ -1,121 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { PendingOrdersProvider } from "@/hooks/use-pending-orders";
+import { Toaster } from "sonner";
+import AppShell from "@/components/layout/app-shell";
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
+import DashboardPage from "@/pages/supplier/dashboard";
+import RetailersPage from "@/pages/supplier/retailers";
+import ProductsPage from "@/pages/supplier/products";
+import OrdersPage from "@/pages/supplier/orders";
+import OrderDetailPage from "@/pages/supplier/order-detail";
+import AnalyticsPage from "@/pages/supplier/analytics";
+import SupplierInvoicesPage from "@/pages/supplier/invoices";
+import ManualOrderPage from "@/pages/supplier/manual-order";
+import CatalogPage from "@/pages/retailer/catalog";
+import CartPage from "@/pages/retailer/cart";
+import RetailerOrdersPage from "@/pages/retailer/orders";
+import RetailerInvoicesPage from "@/pages/retailer/invoices";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function RoleRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return user.role === "supplier" ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <Navigate to="/catalog" replace />
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <PendingOrdersProvider>
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route element={<AppShell />}>
+            {/* Supplier routes */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/retailers" element={<RetailersPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/invoices" element={<SupplierInvoicesPage />} />
+            <Route path="/invoices/new" element={<ManualOrderPage />} />
+            {/* Retailer routes */}
+            <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/my-orders" element={<RetailerOrdersPage />} />
+            <Route path="/my-orders/:id" element={<OrderDetailPage />} />
+            <Route path="/my-invoices" element={<RetailerInvoicesPage />} />
+          </Route>
+          <Route path="*" element={<RoleRedirect />} />
+        </Routes>
+        </PendingOrdersProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
